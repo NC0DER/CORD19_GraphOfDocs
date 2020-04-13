@@ -82,6 +82,11 @@ function draw(query) {
                 caption: "name",
                 size: "none",
                 community: "none"
+            },
+            "Laboratory": {
+                caption: "name",
+                size: "none",
+                community: "none"
             }
         },
         relationships: {
@@ -94,10 +99,6 @@ function draw(query) {
                 thickness: "none"
             },
             "abstract_includes": {
-                caption: "none",
-                thickness: "none"
-            },
-            "full_text_includes": {
                 caption: "none",
                 thickness: "none"
             },

@@ -26,15 +26,18 @@ def graphofdocs(create, initialize, dirpath, window_size,
         # Create uniqueness constraint on key to avoid duplicate word nodes.
         create_unique_constraints(database)
 
+        # Create papers and their citations, authors and their affiliations,
+        # and the graph of words for each abstract, 
+        # which is a subgraph of the total graph of docs.
         create_papers_from_csv(database)
         create_text_authors_citations_from_json(database)
         
-    #if initialize:
+    if initialize:
         # Run initialization functions.
-        #run_initial_algorithms(database)
-        #create_similarity_graph(database)
+        run_initial_algorithms(database)
+        create_similarity_graph(database)
 
     database.close()
     return
 
-if __name__ == '__main__': graphofdocs(True, True, None, 4, False, True, False, False)
+if __name__ == '__main__': graphofdocs(False, True, None, 4, False, True, False, False)

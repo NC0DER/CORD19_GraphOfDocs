@@ -114,14 +114,16 @@ def run_initial_algorithms(database):
     """
     # Append the parameter 'weight' for the weighted version of the algorithm.
     pagerank(database, 'Word', 'connects', 20, 'pagerank')
+    pagerank(database, 'Paper', 'cites', 20, 'pagerank')
     louvain(database, 'Word', 'connects', 'community')
+    louvain(database, 'Paper', 'cites', 'community')
     return
 
 def create_similarity_graph(database):
     """
     Function that creates a similarity graph
     based on Jaccard similarity measure.
-    This measure connects the document nodes with each other
+    This measure connects the paper nodes with each other
     using the relationship 'is_similar', 
     which has the similarity score as a property.
     In order to prepare the data for analysis and visualization,
@@ -133,11 +135,11 @@ def create_similarity_graph(database):
     database.execute('MATCH ()-[r:is_similar]->() DELETE r', 'w')
 
     # Create the similarity graph using Jaccard similarity measure.
-    jaccard(database, 'Document', 'includes', 'Word', 0.23, 'is_similar', 'score')
+    jaccard(database, 'Paper', 'includes', 'Word', 0.23, 'is_similar', 'score')
 
     # Find all similar document communities.
     # Append the parameter 'score' for the weighted version of the algorithm.
-    louvain(database, 'Document', 'is_similar', 'community')
+    louvain(database, 'Paper', 'is_similar', 'community')
     print('Similarity graph created.')
     return
 
