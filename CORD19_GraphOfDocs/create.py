@@ -217,66 +217,78 @@ def create_papers_from_csv(database):
     print(f'Created {total_count - skip_count}, skipped {skip_count} papers.')
     return
 
-def create_authors(obj, database):
+def create_authors(filename, obj, database):
     """
     Wrapper function that extracts all authors and their affiliations
     from the json object. Each of the authors and their affiliations 
     are created and connected.
     """
+    authors = []
     for item in obj['metadata']['authors']:
         # Iterate json obj to find author names and their affiliations.
         name = ''.join([item['first'], ' ', '' if item['middle'] == [] \
             else item['middle'][0] + '. ' if len(item['middle'][0]) == 1 \
             else ' '.join(item['middle']) + ' ', item['last']])
-        location = 'None' if item['affiliation'] == {} \
-            else 'None' if item['affiliation']['location'] == {} \
-            else 'None' if 'country' not in item['affiliation']['location'] \
+        location = '' if item['affiliation'] == {} \
+            else '' if item['affiliation']['location'] == {} \
+            else '' if 'country' not in item['affiliation']['location'] \
             else item['affiliation']['location']['country']
-        institution = 'None' if item['affiliation'] == {} \
+        institution = '' if item['affiliation'] == {} \
             else item['affiliation']['institution']
-        laboratory = 'None' if item['affiliation'] == {} \
+        laboratory = '' if item['affiliation'] == {} \
             else item['affiliation']['laboratory']
 
         # Replace possible empty entries with the string literal 'None'
         # Also if the string is non-empty remove single or double quotes,
         # which make create queries fail.
-        location = 'None' if location == '' \
+        location = '' if location == '' \
             else location.translate({ord(c): '' for c in '\'\"'})
-        institution = 'None' if institution == '' \
+        institution = '' if institution == '' \
             else institution.translate({ord(c): '' for c in '\'\"'})
-        laboratory = 'None' if laboratory == '' \
+        laboratory = '' if laboratory == '' \
             else laboratory.translate({ord(c): '' for c in '\'\"'})
 
         # Merge all info of authors into the database.
         query = f'MERGE (a:Author {{name: "{name}"}}) '
         database.execute(query, 'w')
 
-        if location != 'None':
+        # Save all authors into a list for the current paper.
+        authors.append(name)
+
+        if location != '':
             database.execute(f'MERGE (l:Location {{name: "{location}"}})', 'w')
             query = (
-                f'MATCH (a {{name: "{name}"}}) '
+                f'MATCH (a:Author {{name: "{name}"}}) '
                 f'MATCH (l:Location {{name: "{location}"}}) '
                 f'MERGE (a)-[:affiliates_with]->(l)'
             )
             database.execute(query, 'w')
 
-        if institution != 'None':
+        if institution != '':
             database.execute(f'MERGE (i:Institution {{name: "{institution}"}})', 'w')
             query = (
-                f'MATCH (a {{name: "{name}"}}) '
+                f'MATCH (a:Author {{name: "{name}"}}) '
                 f'MATCH (i:Institution {{name: "{institution}"}}) '
                 f'MERGE (a)-[:affiliates_with]->(i)'
             )
             database.execute(query, 'w')
 
-        if laboratory != 'None':
+        if laboratory != '':
             database.execute(f'MERGE (l:Laboratory {{name: "{laboratory}"}})', 'w')
             query = (
-                f'MATCH (a {{name: "{name}"}}) '
+                f'MATCH (a:Author {{name: "{name}"}}) '
                 f'MATCH (l:Laboratory {{name: "{laboratory}"}}) '
                 f'MERGE (a)-[:affiliates_with]->(l)'
             )
             database.execute(query, 'w')
+
+    # Connect all authors of the paper, with the paper, itself.
+    query = (f'MATCH (a:Author) WHERE a.name IN {authors} '
+              'WITH collect(a) as authors '
+             f'MATCH (p:Paper {{filename: "{filename}"}}) '
+              'UNWIND authors as author '
+              'CREATE (author)-[:writes]->(p)')
+    database.execute(query, 'w')
     return
 
 def create_citations(filename, obj, database):
@@ -293,7 +305,7 @@ def create_citations(filename, obj, database):
               'CREATE (p)-[:cites]->(paper)')
     database.execute(query, 'w')
 
-def create_text(obj, filename, fieldname, edgetype, database):
+def create_text(obj, filename, fieldname, database):
     """
     Wrapper function that extracts a specific type of text
     from the json obj, generates its important terms
@@ -303,7 +315,7 @@ def create_text(obj, filename, fieldname, edgetype, database):
     text = ''.join(item['text'] for item in obj[fieldname])
     if text == '': return
     create_graph_of_words(generate_words(text), 
-                          database, filename, f'{edgetype}_includes')
+                          database, filename, 'includes')
     return
 
 def create_text_authors_citations_from_json(database):
@@ -338,12 +350,11 @@ def create_text_authors_citations_from_json(database):
         # Remove the .json extension from the filename.
         filename = filename.split('.', 1)[0]
         
-        # Generate the terms and create the graph of docs 
-        # from the abstract or/and full text of each file.
-        create_text(obj, filename, 'abstract', 'abstract', database)
-        #create_text(obj, filename, 'body_text', 'full_text', database)
+        # Generate the terms and create the entire  
+        # graph of docs from the abstract of each file.
+        create_text(obj, filename, 'abstract', database)
         
-        create_authors(obj, database)
+        create_authors(filename, obj, database)
         create_citations(filename, obj, database)
         
         # Update the progress counter.
