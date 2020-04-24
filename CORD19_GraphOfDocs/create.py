@@ -368,3 +368,35 @@ def create_text_authors_citations_from_json(database):
     
     print(f'Created info for {total_count} papers.')
     return
+
+def create_co_authors_graph(database):
+    """
+    Function that creates the co-authors subgraph,
+    which is used for the machine learning link prediction model
+    """
+    # Create the entire co-author subgraph.
+    query = (
+        'MATCH (a1:Author)-[:writes]->(p:Paper)<-[:writes]-(a2:Author) ' 
+        'WITH a1, a2, p '
+        'ORDER BY a1, p.year '
+        'WITH a1, a2, collect(p)[0].year AS first_year '
+        'MERGE (a1)-[coauthor: co_author {year: first_year}]-(a2)'
+    )
+    database.execute(query, 'r')
+
+    # Create the training subgraph of co-author.
+    query = (
+        'MATCH (a:Author)-[r:co_author]->(b:Author) '
+        'WHERE r.year < "2013" '
+        'MERGE (a)-[:co_author_early {year: r.year}]-(b)'
+    )
+    database.execute(query, 'r')
+    
+    # Create the testing subgraph of co-author.
+    query = (
+        'MATCH (a:Author)-[r:co_author]->(b:Author) '
+        'WHERE r.year >= "2013" '
+        'MERGE (a)-[:co_author_late {year: r.year}]-(b)'
+    )
+    database.execute(query, 'r')
+    return

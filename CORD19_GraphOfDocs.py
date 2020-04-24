@@ -36,8 +36,9 @@ def graphofdocs(create, initialize, dirpath, window_size,
         # Run initialization functions.
         run_initial_algorithms(database)
         create_similarity_graph(database)
+        create_co_authors_graph(database)
 
     database.close()
     return
 
-if __name__ == '__main__': graphofdocs(False, True, None, 4, False, True, False, False)
+if __name__ == '__main__': graphofdocs(False, False, None, 4, False, True, False, False)
