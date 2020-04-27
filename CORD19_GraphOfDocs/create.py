@@ -188,13 +188,18 @@ def create_papers_from_csv(database):
             count = count + 1
             continue
 
-        # Filename field occasionally includes an second unrelated filename,
+        # The filename field occasionally includes an second unrelated filename,
         # Which is delimited by ';', therefore it is removed below.
         filename = row['sha'].split(';', 1)[0]
 
-        # Title field occasionally includes single or double quotes,
+        # The title field occasionally includes single or double quotes,
         # which make the create query fail, therefore it is removed below.
         title = row['title'].translate({ord(c): '' for c in '\'\"'})
+
+        # The Year field holds the year (e.g 2006) from the publish time 
+        # which is formatted in YYYY-DD-MM or YYYY. It is extracted by string 
+        # splitting at the first dash and storing of the first result.
+        year = str(row['publish_time']).split('-')[0]
 
         # Construct the query, based on columns of the row.
         query = (
@@ -203,6 +208,7 @@ def create_papers_from_csv(database):
                 f'source: "{row["source_x"]}", '
                 f'title: "{title}", '
                 f'publish_time: "{row["publish_time"]}", '
+                f'year: "{year}", '
                 f'url: "{row["url"]}", '
                 f'journal: "{row["journal"]}"}})'
         )
