@@ -5,18 +5,20 @@ to generate train / test datasets
 and features for a Machine learning
 model.
 """
-def get_positive_examples(database, train_set = True):
+def get_positive_examples(database, limit, train_set = True):
     relationship = 'co_author_early' if train_set else 'co_author_late'
     query = (
         f'MATCH (author:Author)-[:{relationship}]->(other:Author) '
-        'RETURN id(author) AS node1, id(other) AS node2, 1 AS label'
+         'WITH id(author) AS node1, id(other) AS node2, 1 AS label, rand() AS random '
+         'WHERE random > 0.5 '
+        f'RETURN node1, node2, label LIMIT {limit}'
     )
     return database.execute(query, 'r')
 
 def get_negative_examples(database, limit, train_set = True, min_hops = 2, max_hops = 3):
     relationship = 'co_author_early' if train_set else 'co_author_late'
     query = (
-        f'MATCH (author:Author)-[:co_author_late*{min_hops}..{max_hops}]-(other:Author) '
+        f'MATCH (author:Author)-[:{relationship}*{min_hops}..{max_hops}]-(other:Author) '
         f'WHERE author <> other AND NOT (author)-[:{relationship}]-(other) '
          'WITH id(author) AS node1, id(other) AS node2, 0 AS label, rand() AS random '
          'WHERE random > 0.5 '
