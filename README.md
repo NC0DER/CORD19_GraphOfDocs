@@ -1,15 +1,16 @@
 # CORD19 Knowledge Graph Representation + Graph-of-docs
 
 This repository hosts code for the papers:
-* [Paper Title (Conference)](https://github.com/NC0DER/GraphOfDocs/tree/785c32db1b55ff3684a980757f54c127f821c6db) - [Download]()
+* [On the utilization of structural and textual information of a scientific knowledge graph to discover future research collaborations: a link prediction perspective (Discovery Science - DS 2020)]() - [Download]()
 
-![image1](https://github.com/NC0DER/GraphOfDocs/blob/master/GraphOfDocs/images/feature_selection.jpg)
+![image1](https://github.com/NC0DER/CORD19_GraphOfDocs/blob/master/images/schema.jpg)
+![image2](https://github.com/NC0DER/CORD19_GraphOfDocs/blob/master/images/graph-of-docs.jpg)
 
 ## Datasets
-Available in [this link]()
+Available in [this link](https://github.com/NC0DER/CORD19_GraphOfDocs/tree/master/datasets)
 
 ## Test Results
-Edit `GraphOfdocs/config_experiments.py` to setup the experiments and run `experiments.py`.
+Edit `experiments.ipynb`.
 
 ## Installation
 **Prequisites:**
