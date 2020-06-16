@@ -42,7 +42,7 @@ pip3 install -r requirements.txt
 Create a new database from the `Neo4j` desktop app using 3.5.14 as the min. version.  
 Update your memory settings to match the following values,  
 and install the following extra plugins as depicted in the image.
-![image2](https://github.com/NC0DER/GraphOfDocs/blob/master/GraphOfDocs/images/settings.jpg)
+![image2](https://github.com/NC0DER/CORD19_GraphOfDocs/blob/master/images/settings.jpg)
 *Hint: if you use a dedicated server that only runs `Neo4j`, you could increase these values, 
 accordingly as specified in the comments of these parameters.*
 
