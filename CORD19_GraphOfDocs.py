@@ -29,8 +29,8 @@ def graphofdocs(create, initialize, dirpath, window_size,
         # Create papers and their citations, authors and their affiliations,
         # and the graph of words for each abstract, 
         # which is a subgraph of the total graph of docs.
-        create_papers_from_csv(database)
-        create_text_authors_citations_from_json(database)
+        create_papers_from_csv(database, dirpath)
+        create_text_authors_citations_from_json(database, dirpath)
         
     if initialize:
         # Run initialization functions.
@@ -41,4 +41,4 @@ def graphofdocs(create, initialize, dirpath, window_size,
     database.close()
     return
 
-if __name__ == '__main__': graphofdocs(False, False, None, 4, False, True, False, False)
+if __name__ == '__main__': graphofdocs(True, False, r'C:\Users\USER\Desktop\CORD-19-research-challenge', 4, False, True, False, False)

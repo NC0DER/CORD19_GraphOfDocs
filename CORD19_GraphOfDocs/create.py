@@ -6,6 +6,7 @@ import re
 import json
 import platform
 import pandas as pd
+from os.path import join
 from timeit import default_timer as timer
 from CORD19_GraphOfDocs.algos import *
 from CORD19_GraphOfDocs.utils import (
@@ -162,12 +163,12 @@ def create_unique_constraints(database):
                      'ASSERT laboratory.name IS UNIQUE', 'w')
     return
 
-def create_papers_from_csv(database):
+def create_papers_from_csv(database, dirpath):
     """
     Function that creates the nodes representing papers,
     by reading each row on the csv.
     """
-    filename = r'C:\Users\USER\Desktop\CORD-19-research-challenge\metadata.csv'
+    filename = join(dirpath, 'metadata.csv')
     current_system = platform.system()
     
     # Read csv into a pandas dataframe.
@@ -324,12 +325,12 @@ def create_text(obj, filename, fieldname, database):
                           database, filename, 'includes')
     return
 
-def create_text_authors_citations_from_json(database):
+def create_text_authors_citations_from_json(database, directory):
     """
     Function that gathers all calls to specialized create() functions,
     in order to create the entirety of the graph.
     """
-    dirpath = r'C:\Users\USER\Desktop\CORD-19-research-challenge\dataset'
+    dirpath = join(directory, 'dataset')
     current_system = platform.system()
 
     # Read plaintext from files, which becomes a string in a list called dataset.
