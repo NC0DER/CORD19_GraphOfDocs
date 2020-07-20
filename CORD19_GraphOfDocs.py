@@ -41,4 +41,4 @@ def graphofdocs(create, initialize, dirpath, window_size,
     database.close()
     return
 
-if __name__ == '__main__': graphofdocs(False, False, None, 4, False, True, False, False)
+if __name__ == '__main__': graphofdocs(True, False, None, 4, False, True, False, False)
