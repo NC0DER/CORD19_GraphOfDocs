@@ -37,6 +37,7 @@ def graphofdocs(create, initialize, dirpath, window_size,
         run_initial_algorithms(database)
         create_similarity_graph(database)
         create_co_authors_graph(database)
+        create_co_authors_similarity_graph(database)
 
     database.close()
     return
