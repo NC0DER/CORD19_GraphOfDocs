@@ -1,7 +1,7 @@
 # CORD19 Knowledge Graph Representation + Graph-of-docs
 
 This repository hosts code for the papers:
-* [On the utilization of structural and textual information of a scientific knowledge graph to discover future research collaborations: a link prediction perspective (Discovery Science - DS 2020)]() - [Download]()
+* [On the utilization of structural and textual information of a scientific knowledge graph to discover future research collaborations: a link prediction perspective (Discovery Science - DS 2020)](https://link.springer.com/chapter/10.1007/978-3-030-61527-7_29) - [Download](https://github.com/NC0DER/CORD19_GraphOfDocs/releases/tag/v1.0)
 
 ![image1](https://github.com/NC0DER/CORD19_GraphOfDocs/blob/master/CORD19_GraphOfDocs/images/schema.jpg)
 ![image2](https://github.com/NC0DER/CORD19_GraphOfDocs/blob/master/CORD19_GraphOfDocs/images/graph-of-docs.jpg)
