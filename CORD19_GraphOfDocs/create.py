@@ -8,7 +8,7 @@ import platform
 import pandas as pd
 from os.path import join
 from timeit import default_timer as timer
-from CORD19_GraphOfDocs.algos import *
+from CORD19_GraphOfDocs.graph_algos import *
 from CORD19_GraphOfDocs.utils import (
     clear_screen, list_filenames, 
     skip_filenames, read_file, 
@@ -113,11 +113,13 @@ def run_initial_algorithms(database):
     The calculated score for each node of the algorithms is being stored
     on the nodes themselves.
     """
-    # Append the parameter 'weight' for the weighted version of the algorithm.
-    pagerank(database, 'Word', 'connects', 20, 'pagerank')
-    pagerank(database, 'Paper', 'cites', 20, 'pagerank')
-    louvain(database, 'Word', 'connects', 'community')
-    louvain(database, 'Paper', 'cites', 'community')
+    with GraphAlgos(database, ['Word'], ['connects']) as graph:
+        graph.louvain(write_property = 'community')
+        graph.pagerank(write_property = 'pagerank')
+
+    with GraphAlgos(database, ['Paper'], ['cites']) as graph:
+        graph.louvain(write_property = 'community')
+        graph.pagerank(write_property = 'pagerank')
     return
 
 def create_similarity_graph(database):
@@ -136,11 +138,19 @@ def create_similarity_graph(database):
     database.execute('MATCH ()-[r:is_similar]->() DELETE r', 'w')
 
     # Create the similarity graph using Jaccard similarity measure.
-    jaccard(database, 'Paper', 'includes', 'Word', 0.23, 'is_similar', 'score')
+    with GraphAlgos(database, 
+                   ['Author', 'Paper', 'Word'],
+                   [('writes', 'NATURAL', []), 
+                   ('includes', 'NATURAL', [])]) as graph:
+        graph.nodeSimilarity(
+            write_property = 'score', 
+            write_relationship = 'is_similar', 
+            cutoff = 0.23, top_k = 1
+        )
 
     # Find all similar document communities.
-    # Append the parameter 'score' for the weighted version of the algorithm.
-    louvain(database, 'Paper', 'is_similar', 'community')
+    with GraphAlgos(database, ['Paper'], ['is_similar']) as graph:
+        graph.louvain(write_property = 'community')
     print('Similarity graph created.')
     return
 
@@ -381,7 +391,7 @@ def create_co_authors_graph(database):
     Function that creates the co-authors subgraph,
     which is used for the machine learning link prediction model
     """
-    # Create the entire co-author subgraph.
+    # Create the entire co-authors subgraph.
     query = (
         'MATCH (a1:Author)-[:writes]->(p:Paper)<-[:writes]-(a2:Author) ' 
         'WITH a1, a2, p '
@@ -391,7 +401,7 @@ def create_co_authors_graph(database):
     )
     database.execute(query, 'r')
 
-    # Create the training subgraph of co-author.
+    # Create the training co-authors subgraph .
     query = (
         'MATCH (a:Author)-[r:co_author]->(b:Author) '
         'WHERE r.year < "2013" '
@@ -399,11 +409,33 @@ def create_co_authors_graph(database):
     )
     database.execute(query, 'r')
     
-    # Create the testing subgraph of co-author.
+    # Create the testing co-authors subgraph.
     query = (
         'MATCH (a:Author)-[r:co_author]->(b:Author) '
         'WHERE r.year >= "2013" '
         'MERGE (a)-[:co_author_late {year: r.year}]-(b)'
+    )
+    database.execute(query, 'r')
+    return
+
+def create_co_authors_similarity_graph(database):
+    """
+    Function that creates the co-authors similarity subgraph,
+    which is used for the machine learning link prediction model
+    """
+    # Create the training similarity subgraph 
+    query = (
+        'MATCH (a:Author)-[:co_author_early]->(b:Author) '
+        'MATCH (a)-[r:is_similar]->(b) '
+        'MERGE (a)-[:is_similar_early {score: r.score}]->(b) '
+    )
+    database.execute(query, 'r')
+
+    # Create the testing co-authors subgraph.
+    query = (
+        'MATCH (a:Author)-[:co_author_late]->(b:Author) '
+        'MATCH (a)-[r:is_similar]->(b) '
+        'MERGE (a)-[:is_similar_late {score: r.score}]->(b) '
     )
     database.execute(query, 'r')
     return
