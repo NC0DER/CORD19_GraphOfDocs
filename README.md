@@ -55,9 +55,6 @@ You could use the `Neo4j Browser` to run your queries,
 or for large queries you could use the custom visualization tool  
 `visualize.html` which is located in the `CORD19_GraphOfDocs` Subdirectory.
 
-## Citation
-You can find the bibtex in [this link](), should you want to cite this paper.
-
 ## Contributors
 * Nikolaos Giarelis (giarelis@ceid.upatras.gr)
 * Nikos Kanakaris (nkanakaris@upnet.gr)
