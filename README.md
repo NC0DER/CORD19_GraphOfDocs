@@ -30,7 +30,7 @@ clone the project to a local folder and install the necessary `Python` libraries
 sudo apt install python3.6
 sudo apt install git-all
 git clone https://github.com/NC0DER/CORD19_GraphOfDocs
-cd GraphOfDocs
+cd CORD19_GraphOfDocs
 pip3 install -r requirements.txt
 ```
 *\* Optionally you could create a virtual environment first,*  
@@ -54,9 +54,6 @@ Once it's done, the database is initialized and ready for use.
 You could use the `Neo4j Browser` to run your queries, 
 or for large queries you could use the custom visualization tool  
 `visualize.html` which is located in the `CORD19_GraphOfDocs` Subdirectory.
-
-## Citation
-You can find the bibtex in [this link](), should you want to cite this paper.
 
 ## Contributors
 * Nikolaos Giarelis (giarelis@ceid.upatras.gr)
